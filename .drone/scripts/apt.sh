@@ -21,7 +21,7 @@ publish() {
 	cd PKGBUILDs
 
 	# Get name of built deb name
-	debname="$(find ./*.deb 2> /dev/null)"
+	debname="$(find ./ | grep '\.deb$')"
 
 	# Upload package
 	curl "https://${proget_server}/debian-packages/upload/makedeb/main/${debname}" \
