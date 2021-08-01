@@ -6,7 +6,7 @@ build() {
 	pkgver="$(cat PKGBUILD | grep '^pkgver=' | awk -F '=' '{print $1}')"
 
 	# Set pkgver in deployment PKGBUILD
-	sed -i "s|pkgver={pkgver}|pkgver='${pkgver}'" "PKGBUILDs/LOCAL/${branch^^}.PKGBUILD"
+	sed -i "s|pkgver={pkgver}|pkgver='${pkgver}'|" "PKGBUILDs/LOCAL/${branch^^}.PKGBUILD"
 
 	# Create package
 	cd PKGBUILDs
