@@ -15,6 +15,7 @@ local publishAptRepository(branch) = {
 		{
 			name: "publish",
 			image: "proget.hunterwittenborn.com/docker/hunter/makedeb:stable",
+			environment: {proget_api_key: {from_secret: "proget_api_key"}},
 			commands: [".drone/scripts/apt.sh publish"]
 		}
 	]
