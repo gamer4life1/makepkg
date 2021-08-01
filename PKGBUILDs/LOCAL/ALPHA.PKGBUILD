@@ -1,6 +1,8 @@
+# Maintainer: Hunter Wittenborn <hunter@hunterwittenborn.com>
 pkgname=makedeb-makepkg-alpha
-pkgver=7.0.0
+pkgver={pkgver}
 pkgrel=1
+pkgdesc="Arch Linux build utility, modified for use with makedeb (alpha release)"
 arch=(any)
 depends=('curl' 'fakeroot' 'libarchive-tools' 'coreutils' 'binutils' 'zstd')
 conflicts=('makepkg' 'makedeb-makepkg' 'makedeb-makepkg-beta')
@@ -18,13 +20,13 @@ package() {
 	cd "${_foldername}"
 
 	# Copy and configure makepkg
-	install -Dm 555 "src/makepkg.sh" "${pkgdir}/usr/bin/${pkgname}"
-	sed -i 's|.*# REMOVE AT PACKAGING||g' "${pkgdir}/usr/bin/${pkgname}"
+	install -Dm 555 "src/makepkg.sh" "${pkgdir}/usr/bin/makedeb-makepkg"
+	sed -i 's|.*# REMOVE AT PACKAGING||g' "${pkgdir}/usr/bin/makedeb-makepkg"
 
 	# Copy functions
 	mkdir -p "${pkgdir}/usr/share/"
-	cp -R "src/functions" "${pkgdir}/usr/share/${pkgname}"
-	chmod 555 "${pkgdir}/usr/share/${pkgname}"
+	cp -R "src/functions" "${pkgdir}/usr/share/makedeb-makepkg"
+	chmod 555 "${pkgdir}/usr/share/makedeb-makepkg"
 
 	# Copy config file
 	install -Dm 444 "src/makepkg.conf" "${pkgdir}/etc/makepkg.conf"
@@ -33,5 +35,5 @@ package() {
 	install -Dm 555 "src/makepkg-template" "${pkgdir}/usr/bin/makepkg-template"
 
 	# Set target OS
-	sed -i 's|target_os="arch"|target_os="debian"|' "${pkgdir}/usr/bin/${pkgname}"
+	sed -i 's|target_os="arch"|target_os="debian"|' "${pkgdir}/usr/bin/makedeb-makepkg"
 }
