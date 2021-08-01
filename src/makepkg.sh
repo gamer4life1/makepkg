@@ -45,7 +45,7 @@ declare -r confdir='/etc'
 declare -r BUILDSCRIPT='PKGBUILD'
 declare -r startdir="$(pwd -P)"
 
-LIBRARY=${LIBRARY:-'/usr/share/makepkg'}
+LIBRARY=${LIBRARY:-'/usr/share/makedeb-makepkg'}
 
 # Options
 ASDEPS=0
