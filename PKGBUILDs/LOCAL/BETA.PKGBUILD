@@ -36,4 +36,8 @@ package() {
 
 	# Set target OS
 	sed -i 's|target_os="arch"|target_os="debian"|' "${pkgdir}/usr/bin/makedeb-makepkg"
+
+	# Create pacman binary
+	touch "${pkgdir}/usr/bin/pacman"
+	chmod 555 "${pkgdir}/usr/bin/pacman"
 }

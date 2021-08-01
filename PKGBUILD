@@ -1,6 +1,6 @@
 # Maintainer: Hunter Wittenborn
 pkgname=makedeb-makepkg
-pkgver=7.0.1
+pkgver=7.0.2
 pkgrel=1
 arch=(any)
 depends=('curl' 'fakeroot' 'libarchive-tools' 'coreutils' 'binutils' 'zstd')
@@ -35,4 +35,8 @@ package() {
 
 	# Set target OS
 	sed -i 's|target_os="arch"|target_os="debian"|' "${pkgdir}/usr/bin/${pkgname}"
+
+	# Create pacman binary
+	touch "${pkgdir}/usr/bin/pacman"
+	chmod 555 "${pkgdir}/usr/bin/pacman"
 }
