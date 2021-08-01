@@ -3,15 +3,18 @@ set -xe
 
 build() {
 	# Get value of $pkgver from master PKGBUILD
-	pkgver="$(cat PKGBUILD | grep '^pkgver=' | awk -F '=' '{print $1}')"
+	pkgver="$(cat PKGBUILD | grep '^pkgver=' | awk -F '=' '{print $2}')"
 
 	# Set pkgver in deployment PKGBUILD
 	sed -i "s|pkgver={pkgver}|pkgver='${pkgver}'|" "PKGBUILDs/LOCAL/${branch^^}.PKGBUILD"
 
 	# Create package
-	cd PKGBUILDs
+	cd PKGBUILDs/LOCAL
 
-	makedeb -p "${branch^^}.PKGBUILD" --nodeps
+	useradd user
+	chmod 777 ./ -R
+
+	sudo -u user -- makedeb -p "${branch^^}.PKGBUILD" --nodeps
 }
 
 publish() {
