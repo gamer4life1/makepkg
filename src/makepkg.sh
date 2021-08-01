@@ -45,6 +45,9 @@ declare -r confdir='/etc'
 declare -r BUILDSCRIPT='PKGBUILD'
 declare -r startdir="$(pwd -P)"
 
+declare -r makepkg_target_os="arch"
+
+LIBRARY=${LIBRARY:-'./functions'}    # REMOVE AT PACKAGING
 LIBRARY=${LIBRARY:-'/usr/share/makedeb-makepkg'}
 
 # Options
@@ -959,63 +962,70 @@ run_split_packaging() {
 }
 
 usage() {
-	printf "makepkg (pacman) %s\n" "$makepkg_version"
+	printf "makepkg (%s)\n" "$makepkg_version"
 	echo
-	printf -- "$(gettext "Make packages compatible for use with pacman")\n"
+	printf -- "$(gettext "Arch Linux build utility")\n"
 	echo
-	printf -- "$(gettext "Usage: %s [options]")\n" "$0"
+	printf -- "$(gettext "Usage: %s [options]")\n" "makepkg"
 	echo
 	printf -- "$(gettext "Options:")\n"
-	printf -- "$(gettext "  -A, --ignorearch Ignore incomplete %s field in %s")\n" "arch" "$BUILDSCRIPT"
-	printf -- "$(gettext "  -c, --clean      Clean up work files after build")\n"
-	printf -- "$(gettext "  -C, --cleanbuild Remove %s dir before building the package")\n" "\$srcdir/"
-	printf -- "$(gettext "  -d, --nodeps     Skip all dependency checks")\n"
-	printf -- "$(gettext "  -e, --noextract  Do not extract source files (use existing %s dir)")\n" "\$srcdir/"
-	printf -- "$(gettext "  -f, --force      Overwrite existing package")\n"
-	printf -- "$(gettext "  -g, --geninteg   Generate integrity checks for source files")\n"
-	printf -- "$(gettext "  -h, --help       Show this help message and exit")\n"
-	printf -- "$(gettext "  -i, --install    Install package after successful build")\n"
-	printf -- "$(gettext "  -L, --log        Log package build process")\n"
-	printf -- "$(gettext "  -m, --nocolor    Disable colorized output messages")\n"
-	printf -- "$(gettext "  -o, --nobuild    Download and extract files only")\n"
-	printf -- "$(gettext "  -p <file>        Use an alternate build script (instead of '%s')")\n" "$BUILDSCRIPT"
-	printf -- "$(gettext "  -r, --rmdeps     Remove installed dependencies after a successful build")\n"
-	printf -- "$(gettext "  -R, --repackage  Repackage contents of the package without rebuilding")\n"
-	printf -- "$(gettext "  -s, --syncdeps   Install missing dependencies with %s")\n" "pacman"
-	printf -- "$(gettext "  -S, --source     Generate a source-only tarball without downloaded sources")\n"
-	printf -- "$(gettext "  -V, --version    Show version information and exit")\n"
-	printf -- "$(gettext "  --allsource      Generate a source-only tarball including downloaded sources")\n"
-	printf -- "$(gettext "  --check          Run the %s function in the %s")\n" "check()" "$BUILDSCRIPT"
-	printf -- "$(gettext "  --config <file>  Use an alternate config file (instead of '%s')")\n" "$confdir/makepkg.conf"
-	printf -- "$(gettext "  --holdver        Do not update VCS sources")\n"
-	printf -- "$(gettext "  --key <key>      Specify a key to use for %s signing instead of the default")\n" "gpg"
-	printf -- "$(gettext "  --noarchive      Do not create package archive")\n"
-	printf -- "$(gettext "  --nocheck        Do not run the %s function in the %s")\n" "check()" "$BUILDSCRIPT"
-	printf -- "$(gettext "  --noprepare      Do not run the %s function in the %s")\n" "prepare()" "$BUILDSCRIPT"
-	printf -- "$(gettext "  --nosign         Do not create a signature for the package")\n"
-	printf -- "$(gettext "  --packagelist    Only list package filepaths that would be produced")\n"
-	printf -- "$(gettext "  --printsrcinfo   Print the generated SRCINFO and exit")\n"
-	printf -- "$(gettext "  --sign           Sign the resulting package with %s")\n" "gpg"
-	printf -- "$(gettext "  --skipchecksums  Do not verify checksums of the source files")\n"
-	printf -- "$(gettext "  --skipinteg      Do not perform any verification checks on source files")\n"
-	printf -- "$(gettext "  --skippgpcheck   Do not verify source files with PGP signatures")\n"
-	printf -- "$(gettext "  --verifysource   Download source files (if needed) and perform integrity checks")\n"
+	printf -- "$(gettext "  -A, --ignorearch    Ignore incomplete %s field in %s")\n" "arch" "$BUILDSCRIPT"
+	printf -- "$(gettext "  -c, --clean         Clean up work files after build")\n"
+	printf -- "$(gettext "  -C, --cleanbuild    Remove %s dir before building the package")\n" "\$srcdir/"
+	printf -- "$(gettext "  -d, --nodeps        Skip all dependency checks")\n"
+	printf -- "$(gettext "  -e, --noextract     Do not extract source files (use existing %s dir)")\n" "\$srcdir/"
+	printf -- "$(gettext "  -f, --force         Overwrite existing package")\n"
+	printf -- "$(gettext "  -g, --geninteg      Generate integrity checks for source files")\n"
+	printf -- "$(gettext "  -h, --help          Show this help message and exit")\n"
+	printf -- "$(gettext "  -i, --install       Install package after successful build")\n"
+	printf -- "$(gettext "  -L, --log           Log package build process")\n"
+	printf -- "$(gettext "  -m, --nocolor       Disable colorized output messages")\n"
+	printf -- "$(gettext "  -o, --nobuild       Download and extract files only")\n"
+	printf -- "$(gettext "  -p <file>           Use an alternate build script (instead of '%s')")\n" "$BUILDSCRIPT"
+	printf -- "$(gettext "  -r, --rmdeps        Remove installed dependencies after a successful build")\n"
+	printf -- "$(gettext "  -R, --repackage     Repackage contents of the package without rebuilding")\n"
+	printf -- "$(gettext "  -s, --syncdeps      Install missing dependencies with %s")\n" "pacman"
+	printf -- "$(gettext "  -S, --source        Generate a source-only tarball without downloaded sources")\n"
+	printf -- "$(gettext "  -V, --version       Show version information and exit")\n"
+	printf -- "$(gettext "  --allsource         Generate a source-only tarball including downloaded sources")\n"
+	printf -- "$(gettext "  --check             Run the %s function in the %s")\n" "check()" "$BUILDSCRIPT"
+	printf -- "$(gettext "  --config <file>     Use an alternate config file (instead of '%s')")\n" "$confdir/makepkg.conf"
+	printf -- "$(gettext "  --distrovars        Enable release-specific variables\n")"
+	printf -- "$(gettext "  --holdver           Do not update VCS sources")\n"
+	printf -- "$(gettext "  --key <key>         Specify a key to use for %s signing instead of the default")\n" "gpg"
+	printf -- "$(gettext "  --noarchive         Do not create package archive")\n"
+	printf -- "$(gettext "  --nocheck           Do not run the %s function in the %s")\n" "check()" "$BUILDSCRIPT"
+	printf -- "$(gettext "  --noprepare         Do not run the %s function in the %s")\n" "prepare()" "$BUILDSCRIPT"
+	printf -- "$(gettext "  --nosign            Do not create a signature for the package")\n"
+	printf -- "$(gettext "  --packagelist       Only list package filepaths that would be produced")\n"
+	printf -- "$(gettext "  --printsrcinfo      Print the generated SRCINFO and exit")\n"
+	printf -- "$(gettext "  --sign              Sign the resulting package with %s")\n" "gpg"
+	printf -- "$(gettext "  --skipchecksums     Do not verify checksums of the source files")\n"
+	printf -- "$(gettext "  --skipinteg         Do not perform any verification checks on source files")\n"
+	printf -- "$(gettext "  --skippgpcheck      Do not verify source files with PGP signatures")\n"
+	printf -- "$(gettext "  --verifysource      Download source files (if needed) and perform integrity checks")\n"
 	echo
-	printf -- "$(gettext "These options can be passed to %s:")\n" "pacman"
-	echo
-	printf -- "$(gettext "  --asdeps         Install packages as non-explicitly installed")\n"
-	printf -- "$(gettext "  --needed         Do not reinstall the targets that are already up to date")\n"
-	printf -- "$(gettext "  --noconfirm      Do not ask for confirmation when resolving dependencies")\n"
-	printf -- "$(gettext "  --noprogressbar  Do not show a progress bar when downloading files")\n"
-	echo
-	printf -- "$(gettext "If %s is not specified, %s will look for '%s'")\n" "-p" "makepkg" "$BUILDSCRIPT"
-	echo
+
+	if [[ "${makepkg_target_os}" == "arch" ]]; then
+		printf "These options can be passed to pacman:\n"
+
+		printf -- "$(gettext "  --asdeps         Install packages as non-explicitly installed")\n"
+		printf -- "$(gettext "  --needed         Do not reinstall the targets that are already up to date")\n"
+		printf -- "$(gettext "  --noconfirm      Do not ask for confirmation when resolving dependencies")\n"
+		printf -- "$(gettext "  --noprogressbar  Do not show a progress bar when downloading files")\n"
+
+		printf -- "$(gettext "If %s is not specified, %s will look for '%s'")\n" "-p" "makepkg" "$BUILDSCRIPT"
+		echo
+	fi
 }
 
 version() {
-	printf "makepkg (pacman) %s\n" "$makepkg_version"
-	printf -- "Copyright (c) 2006-2021 Pacman Development Team <pacman-dev@archlinux.org>.\n"
-	printf -- "Copyright (C) 2002-2006 Judd Vinet <jvinet@zeroflux.org>.\n"
+	printf "makepkg (%s) %s\n" "$makepkg_version"
+	printf -- "    Copyright (c) 2021 Hunter Wittenborn <hunter@hunterwittenborn.com>.\n"
+	printf -- "\n"
+	printf -- "Thank you for the work done by the Arch Linux team in creating makepkg itself, without which makedeb wouldn't be possible.\n"
+	printf -- "    2002-2006 Judd Vinet <jvinet@zeroflux.org>.\n"
+	printf -- "    2006-2021 Pacman Development Team <pacman-dev@archlinux.org>.\n"
 	printf '\n'
 	printf -- "$(gettext "\
 This is free software; see the source for copying conditions.\n\
@@ -1042,10 +1052,14 @@ OPT_LONG=('allsource' 'check' 'clean' 'cleanbuild' 'config:' 'force' 'geninteg'
           'help' 'holdver' 'ignorearch' 'install' 'key:' 'log' 'noarchive' 'nobuild'
           'nocolor' 'nocheck' 'nodeps' 'noextract' 'noprepare' 'nosign' 'packagelist'
           'printsrcinfo' 'repackage' 'rmdeps' 'sign' 'skipchecksums' 'skipinteg'
-          'skippgpcheck' 'source' 'syncdeps' 'verifysource' 'version')
+          'skippgpcheck' 'source' 'syncdeps' 'verifysource' 'version'
 
-# Pacman Options
-OPT_LONG+=('asdeps' 'noconfirm' 'needed' 'noprogressbar')
+		  'distrovars')
+
+# Pacman options
+if [[ "${makepkg_target_os}" == "arch" ]]; then
+	OPT_LONG+=('asdeps' 'needed' 'noconfirm' 'noprogressbar')
+fi
 
 if ! parseopts "$OPT_SHORT" "${OPT_LONG[@]}" -- "$@"; then
 	exit $E_INVALID_OPTION
@@ -1069,6 +1083,7 @@ while true; do
 		--check)          RUN_CHECK='y' ;;
 		--config)         shift; MAKEPKG_CONF=$1 ;;
 		-d|--nodeps)      NODEPS=1 ;;
+		--distrovars)     DISTROVARIABLES='y' ;;
 		-e|--noextract)   NOEXTRACT=1 ;;
 		-f|--force)       FORCE=1 ;;
 		-F)               INFAKEROOT=1 ;;

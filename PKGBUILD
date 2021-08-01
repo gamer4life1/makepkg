@@ -18,16 +18,21 @@ sha256sums=('SKIP')
 package() {
 	cd "${_foldername}"
 
-	# Copy makepkg binary
-	install -Dm 555 "src/makepkg.sh" "${pkgdir}/usr/bin/makepkg"
+	# Copy and configure makepkg
+	install -Dm 555 "src/makepkg.sh" "${pkgdir}/usr/bin/${pkgname}"
+	sed -i 's|.*# REMOVE AT PACKAGING||g' "${pkgdir}/usr/bin/${pkgname}"
 
 	# Copy functions
 	mkdir -p "${pkgdir}/usr/share/"
-	cp -R "src/functions" "${pkgdir}/usr/share/makepkg"
+	cp -R "src/functions" "${pkgdir}/usr/share/${pkgname}"
+	chmod 555 "${pkgdir}/usr/share/${pkgname}"
 
 	# Copy config file
-	cp "src/makepkg.conf" "${pkgdir}/etc/makepkg.conf"
+	install -Dm 444 "src/makepkg.conf" "${pkgdir}/etc/makepkg.conf"
 
 	# Copy makepkg-template
 	install -Dm 555 "src/makepkg-template" "${pkgdir}/usr/bin/makepkg-template"
+
+	# Set target OS
+	sed -i 's|target_os="arch"|target_os="debian"|' "${pkgdir}/usr/bin/${pkgname}"
 }
