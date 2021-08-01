@@ -9,7 +9,7 @@ arch=(any)
 depends=('curl' 'fakeroot' 'libarchive-tools' 'coreutils' 'binutils' 'zstd' 'gettext')
 conflicts=('makedeb-makepkg-beta' 'makedeb-makepkg-alpha')
 license=('GPL2')
-url="https://github.com/hwittenborn/makepkg"
+url="https://github.com/makedeb/makepkg"
 
 source=("git+file://${_gitdir}")
 sha256sums=('SKIP')
