@@ -16,7 +16,7 @@ build() {
 
 publish() {
 	cd PKGBUILDs
-
+ 
 	# Get name of built deb name
 	debname="$(find ./*.deb 2> /dev/null)"
 
