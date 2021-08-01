@@ -21,12 +21,13 @@ publish() {
 	cd PKGBUILDs
 
 	# Get name of built deb name
-	debname="$(find ./ | grep '\.deb$')"
+	debname_path="$(find ./ | grep '\.deb$')"
+	debname="$(basename "${debname_path}")"
 
 	# Upload package
 	curl "https://${proget_server}/debian-packages/upload/makedeb/main/${debname}" \
 	     --user "api:${proget_api_key}" \
-	     --upload-file "${debname}"
+	     --upload-file "${debname_path}"
 }
 
 ##################
