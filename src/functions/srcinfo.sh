@@ -120,6 +120,9 @@ write_srcinfo_header() {
 write_srcinfo_content() {
 	local pkg
 
+	srcinfo_open_section 'generated-by' 'makedeb-makepkg'
+	srcinfo_separate_section
+
 	srcinfo_write_global
 
 	for pkg in "${pkgname[@]}"; do
