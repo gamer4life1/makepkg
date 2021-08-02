@@ -66,6 +66,8 @@ srcinfo_write_section_details() {
 	                              optdepends makedepends checkdepends
 	                              "${known_hash_algos[@]/%/sums}")
 
+	local multivalued_arch_attrs+=($(srcinfo_get_distro_variables))
+
 	for attr in "${singlevalued[@]}"; do
 		pkgbuild_extract_to_srcinfo "$1" "$attr" 0
 	done
@@ -92,6 +94,8 @@ srcinfo_write_global() {
 	                   noextract options backup
 	                   source validpgpkeys "${known_hash_algos[@]/%/sums}")
 
+	local multivalued+=($(srcinfo_get_distro_variables))
+
 	srcinfo_open_section 'pkgbase' "${pkgbase:-$pkgname}"
 	srcinfo_write_section_details ''
 }
@@ -100,6 +104,9 @@ srcinfo_write_package() {
 	local singlevalued=(pkgdesc url install changelog)
 	local multivalued=(arch groups license checkdepends depends optdepends
 	                   provides conflicts replaces options backup)
+
+	local multivalued+=($(srcinfo_get_distro_variables))
+
 
 	srcinfo_open_section 'pkgname' "$1"
 	srcinfo_write_section_details "$1"
@@ -124,4 +131,24 @@ write_srcinfo_content() {
 write_srcinfo() {
 	write_srcinfo_header
 	write_srcinfo_content
+}
+
+# Get list of distro-specific packages for:
+# depends, optdepends, conflicts, provides, replaces, and makedepends.
+srcinfo_get_distro_variables() {
+	local package_arch
+	get_pkgbuild_attribute "$1" 'arch' 1 'package_arch'
+
+	for i in source depends optdepends conflicts provides replaces makedepends; do
+
+		local distro_variables=""
+
+		for j in "${package_arch}"; do
+			local distro_variables+="$(set | grep -Eo "^[[:alnum:]]*_${i}=|^[[:alnum:]]*_${i}_${j}=" | sed 's|=$||g')"
+		done
+
+		if [[ "${distro_variables}" != "" ]]; then
+			echo ${distro_variables}
+		fi
+	done
 }

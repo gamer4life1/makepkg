@@ -373,12 +373,20 @@ error_function() {
 }
 
 merge_arch_attrs() {
-	local attr supported_attrs=(
+	local attr current_env_vars supported_attrs=(
 		provides conflicts depends replaces optdepends
 		makedepends checkdepends)
 
 	for attr in "${supported_attrs[@]}"; do
-		eval "$attr+=(\"\${${attr}_$CARCH[@]}\")"
+		[[ "${DISTROVARIABLES}" == "y" ]] && local distro_attr_data="$(eval echo "\${${distro_release_name}_${attr}_$CARCH[@]}")"
+
+		if [[ "${distro_attr_data}" != "" ]]; then
+			local attr_data="${distro_attr_data}"
+		else
+			local attr_data="$(eval echo "\${${attr}_$CARCH[@]}")"
+		fi
+
+		eval "$attr+=(${attr_data})"
 	done
 
 	# ensure that calling this function is idempotent.
