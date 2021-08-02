@@ -1,6 +1,6 @@
 # Maintainer: Hunter Wittenborn
 pkgname=makedeb-makepkg
-pkgver=7.0.5
+pkgver=7.0.6
 pkgrel=1
 arch=(any)
 depends=('curl' 'fakeroot' 'libarchive-tools' 'coreutils' 'binutils' 'zstd' 'gettext')

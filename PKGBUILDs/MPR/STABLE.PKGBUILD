@@ -11,11 +11,11 @@ conflicts=('makedeb-makepkg-beta' 'makedeb-makepkg-alpha')
 license=('GPL2')
 url="https://github.com/makedeb/makepkg"
 
-source=("git+file://${_gitdir}")
+source=("${url}/archive/refs/tags/v${pkgver}-${_release_type}.tar.gz")
 sha256sums=('SKIP')
 
 package() {
-	cd "${_foldername}"
+	cd "makepkg-${pkgver}-${_release_type}"
 
 	# Copy and configure makepkg
 	install -Dm 555 "src/makepkg.sh" "${pkgdir}/usr/bin/makedeb-makepkg"
