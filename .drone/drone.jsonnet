@@ -79,8 +79,8 @@ local userRepoPublish(package_name, branch, repo_name) = {
 	userRepoPublish("makedeb-makepkg-beta", "beta", "mpr"),
 	userRepoPublish("makedeb-makepkg-alpha", "alpha", "mpr"),
 
-	// userRepoPublish("makedeb-makepkg", "stable", "aur"),
-	// userRepoPublish("makedeb-makepkg-beta", "beta", "aur"),
-	// userRepoPublish("makedeb-makepkg-alpha", "alpha", "aur")
+	userRepoPublish("makedeb-makepkg", "stable", "aur"),
+	userRepoPublish("makedeb-makepkg-beta", "beta", "aur"),
+	userRepoPublish("makedeb-makepkg-alpha", "alpha", "aur")
 
 ]
