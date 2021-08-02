@@ -21,6 +21,7 @@ package() {
 	# Copy and configure makepkg
 	install -Dm 555 "src/makepkg.sh" "${pkgdir}/usr/bin/${pkgname}"
 	sed -i 's|.*# REMOVE AT PACKAGING||g' "${pkgdir}/usr/bin/${pkgname}"
+  sed -i "s|makepkg_version='git'|makepkg_version='${pkgver}-${pkgrel}'|" "${pkgdir}/usr/bin/${pkgname}"
 
 	# Copy functions
 	mkdir -p "${pkgdir}/usr/share/"

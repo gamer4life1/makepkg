@@ -41,7 +41,7 @@ unset CDPATH
 unset GREP_OPTIONS
 
 declare -r makepkg_program_name="${makepkg_program_name:-makedeb-makepkg}"
-declare -r makepkg_version='6.0.0'
+declare -r makepkg_version='git'
 declare -r confdir='/etc'
 declare -r BUILDSCRIPT='PKGBUILD'
 declare -r startdir="$(pwd -P)"
