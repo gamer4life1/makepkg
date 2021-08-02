@@ -8,6 +8,8 @@ pkgdesc="Arch Linux build utility, modified for use with makedeb (beta release)"
 arch=(any)
 depends=('curl' 'fakeroot' 'libarchive-tools' 'coreutils' 'binutils' 'zstd' 'gettext')
 conflicts=('makedeb-makepkg' 'makedeb-makepkg-alpha')
+replaces=('makepkg')
+provides=('makepkg')
 license=('GPL2')
 url="https://github.com/makedeb/makepkg"
 
