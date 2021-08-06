@@ -1025,6 +1025,7 @@ usage() {
 	printf -- "$(gettext "  --check             Run the %s function in the %s")\n" "check()" "$BUILDSCRIPT"
 	printf -- "$(gettext "  --config <file>     Use an alternate config file (instead of '%s')")\n" "$confdir/makepkg.conf"
 	printf -- "$(gettext "  --distrovars        Enable release-specific variables\n")"
+	printf -- "$(gettext "  --format-makedeb    Properly format output for makedeb\n")"
 	printf -- "$(gettext "  --holdver           Do not update VCS sources")\n"
 	printf -- "$(gettext "  --key <key>         Specify a key to use for %s signing instead of the default")\n" "gpg"
 	printf -- "$(gettext "  --noarchive         Do not create package archive")\n"
@@ -1157,12 +1158,9 @@ done
 
 # Check if '--skip-makedeb-warning' was passed
 if ! (( ${FORMAT_MAKEDEB} )); then
-	colorize
-
-	error "This program is for internal use by makedeb, and should not be called directly."
-	error "The changes to this fork of makepkg are not well documented, and you may run into issues."
-	error "If you'd like to continue, use the '--format-makedeb' option."
-	exit 1
+	warning "This program is for internal use by makedeb, and should not be called directly."
+	warning "The changes to this fork of makepkg are not well documented, and you may run into issues."
+	warning "To supress this warning, use the '--format-makedeb' option."
 fi
 
 # attempt to consume any extra argv as environment variables. this supports
