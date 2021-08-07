@@ -186,7 +186,7 @@ clean_up() {
 }
 
 enter_fakeroot() {
-	msg "$(gettext "Entering %s environment...")" "fakeroot"
+	(( ! FORMAT_MAKEDEB )) && msg "$(gettext "Entering %s environment...")" "fakeroot"
 	fakeroot -- bash -$- "${BASH_SOURCE[0]}" -F "${ARGLIST[@]}" || exit $?
 }
 
@@ -705,12 +705,12 @@ create_package() {
 	fi
 
 	cd_safe "$pkgdir"
-	(( NOARCHIVE )) || msg "$(gettext "Creating package \"%s\"...")" "$pkgname"
+	(( NOARCHIVE || FORMAT_MAKEDEB )) || msg "$(gettext "Creating package \"%s\"...")" "$pkgname"
 
 	pkgarch=$(get_pkg_arch)
-	msg2 "$(gettext "Generating %s file...")" ".PKGINFO"
+	(( ! FORMAT_MAKEDEB )) && msg2 "$(gettext "Generating %s file...")" ".PKGINFO"
 	write_pkginfo > .PKGINFO
-	msg2 "$(gettext "Generating %s file...")" ".BUILDINFO"
+	(( ! FORMAT_MAKEDEB )) && msg2 "$(gettext "Generating %s file...")" ".BUILDINFO"
 	write_buildinfo > .BUILDINFO
 
 	# check for changelog/install files
@@ -740,7 +740,7 @@ create_package() {
 	# ensure all elements of the package have the same mtime
 	find . -exec touch -h -d @$SOURCE_DATE_EPOCH {} +
 
-	msg2 "$(gettext "Generating .MTREE file...")"
+	(( ! FORMAT_MAKEDEB )) && msg2 "$(gettext "Generating .MTREE file...")"
 	list_package_files | LANG=C bsdtar -cnf - --format=mtree \
 		--options='!all,use-set,type,uid,gid,mode,time,size,md5,sha256,link' \
 		--null --files-from - --exclude .MTREE | gzip -c -f -n > .MTREE
@@ -1157,10 +1157,17 @@ while true; do
 done
 
 # Check if '--skip-makedeb-warning' was passed
-if ! (( ${FORMAT_MAKEDEB} )); then
+if ! (( FORMAT_MAKEDEB )); then
 	warning "This program is for internal use by makedeb, and should not be called directly."
 	warning "The changes to this fork of makepkg are not well documented, and you may run into issues."
 	warning "To supress this warning, use the '--format-makedeb' option."
+fi
+
+# Set variable if running on Arch Linux
+export RUNNING_ON_ARCH=0
+
+if [[ "${makepkg_target_os}" == "arch" ]]; then
+	export RUNNING_ON_ARCH=1
 fi
 
 # attempt to consume any extra argv as environment variables. this supports
@@ -1393,7 +1400,7 @@ fi
 if (( INFAKEROOT )); then
 	if (( SOURCEONLY )); then
 		create_srcpackage
-		msg "$(gettext "Leaving %s environment.")" "fakeroot"
+		(( ! FORMAT_MAKEDEB )) && msg "$(gettext "Leaving %s environment.")" "fakeroot"
 		exit $E_OK
 	fi
 
@@ -1408,11 +1415,11 @@ if (( INFAKEROOT )); then
 
 	create_debug_package
 
-	msg "$(gettext "Leaving %s environment.")" "fakeroot"
+	(( ! FORMAT_MAKEDEB )) && msg "$(gettext "Leaving %s environment.")" "fakeroot"
 	exit $E_OK
 fi
 
-msg "$(gettext "Making package: %s")" "$pkgbase $basever ($(date +%c))"
+(( ! FORMAT_MAKEDEB )) && msg "$(gettext "Making package: %s")" "$pkgbase $basever ($(date +%c))"
 
 # if we are creating a source-only package, go no further
 if (( SOURCEONLY )); then
@@ -1456,14 +1463,14 @@ else
 	fi
 	deperr=0
 
-	msg "$(gettext "Checking runtime dependencies...")"
+	(( ${RUNNING_ON_ARCH})) && msg "$(gettext "Checking runtime dependencies...")"
 	resolve_deps ${depends[@]} || deperr=1
 
 	if (( RMDEPS && INSTALL )); then
 		original_pkglist=($(run_pacman -Qq))    # required by remove_dep
 	fi
 
-	msg "$(gettext "Checking buildtime dependencies...")"
+	(( ${RUNNING_ON_ARCH})) && msg "$(gettext "Checking buildtime dependencies...")"
 	if (( CHECKFUNC )); then
 		resolve_deps "${makedepends[@]}" "${checkdepends[@]}" || deperr=1
 	else
@@ -1544,10 +1551,10 @@ fi
 
 # if inhibiting archive creation, go no further
 if (( NOARCHIVE )); then
-	msg "$(gettext "Package directory is ready.")"
+	(( ! FORMAT_MAKEDEB )) && msg "$(gettext "Package directory is ready.")"
 	exit $E_OK
 fi
 
-msg "$(gettext "Finished making: %s")" "$pkgbase $basever ($(date +%c))"
+(( ! FORMAT_MAKEDEB )) && msg "$(gettext "Finished making: %s")" "$pkgbase $basever ($(date +%c))"
 
 install_package && exit $E_OK || exit $E_INSTALL_FAILED
