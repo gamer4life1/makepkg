@@ -207,20 +207,30 @@ print_all_package_names() {
 }
 
 get_all_sources() {
-	local aggregate l a
+	local aggregate l a current_environment_variables
+
+	current_environment_variables="$(set | grep -o '^[^= ]*=' | sed 's|=$||')"
 
 	if array_build l 'source'; then
 		aggregate+=("${l[@]}")
 	fi
+
+	for i in $(echo "${current_environment_variables}" | grep '.*_source$'); do
+		if array_build l "${i}"; then
+			aggregate+=("${l[@]}")
+		fi
+	done
 
 	for a in "${arch[@]}"; do
 		if array_build l "source_$a"; then
 			aggregate+=("${l[@]}")
 		fi
 
-		if array_build l "${distro_release_name}_source_${a}"; then
-			aggregate+=("${l[@]}")
-		fi
+		for i in $(echo "${current_environment_variables}" | grep ".*_source_${a}\$"); do
+			if array_build l "${i}"; then
+				aggregate+=("${l[@]}")
+			fi
+		done
 	done
 
 	array_build "$1" "aggregate"

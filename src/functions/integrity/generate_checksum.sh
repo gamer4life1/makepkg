@@ -28,9 +28,13 @@ source "$LIBRARY/util/pkgbuild.sh"
 source "$LIBRARY/util/schema.sh"
 
 generate_one_checksum() {
-	local integ=$1 arch=$2 sources numsrc indentsz idx
+	local integ=$1 arch=$2 distro="${3}" sources numsrc indentsz idx
 
-	if [[ $arch ]]; then
+	if [[ "${distro}" && "${arch}" ]]; then
+		array_build sources "${distro}_source_${arch}"
+	elif [[ "${distro}" ]]; then
+		array_build sources "${distro}_source"
+	elif [[ $arch ]]; then
 		array_build sources "source_$arch"
 	else
 		array_build sources 'source'
@@ -41,7 +45,11 @@ generate_one_checksum() {
 		return
 	fi
 
-	if [[ $arch ]]; then
+	if [[ "${distro}" && "${arch}" ]]; then
+		printf "%s_%ssums_%s=(%n" "${distro}" "$integ" "$arch" indentsz
+	elif [[ "${distro}" ]]; then
+		printf "%s_%ssums=(%n" "${distro}" "$integ" indentsz
+	elif [[ $arch ]]; then
 		printf "%ssums_%s=(%n" "$integ" "$arch" indentsz
 	else
 		printf "%ssums=(%n" "$integ" indentsz
@@ -81,12 +89,15 @@ generate_one_checksum() {
 generate_checksums() {
 	msg "$(gettext "Generating checksums for source files...")" >&2
 
-	local integlist
+	local integlist current_environment_variables
+
 	if (( $# == 0 )); then
 		IFS=$'\n' read -rd '' -a integlist < <(get_integlist)
 	else
 		integlist=("$@")
 	fi
+
+	current_environment_variables="$(set | grep -o '^[^= ]*=' | sed 's|=$||')"
 
 	local integ
 	for integ in "${integlist[@]}"; do
@@ -96,8 +107,17 @@ generate_checksums() {
 		fi
 
 		generate_one_checksum "$integ"
+
+		for distro in $(echo "${current_environment_variables}" | grep ".*_source\$" | sed 's|_source$||'); do
+			generate_one_checksum "${integ}" "" "${distro}"
+		done
+
 		for a in "${arch[@]}"; do
 			generate_one_checksum "$integ" "$a"
+
+			for distro in $(echo "${current_environment_variables}" | grep ".*_source_${a}\$" | sed "s|_source_${a}\$||"); do
+				generate_one_checksum "${integ}" "${a}" "${distro}"
+			done
 		done
 	done
 }
