@@ -49,6 +49,13 @@ lint_one_pkgname() {
 		error "$(gettext "%s may only contain ascii characters.")" "$type"
 		return 1
 	fi
+
+	# Packages in 'optdepends' are allowed to be prefixed with 'r!' and 's!' for
+	# the Debian control file syntax, so we temporary strip them here.
+	if [[ "${type}" == "optdepends" ]]; then
+		name="$(echo "${name}" | sed -e 's|^r!||' -e 's|^s!||')"
+	fi
+
 	if [[ $name = *[^[:alnum:]+_.@-]* ]]; then
 		error "$(gettext "%s contains invalid characters: '%s'")" \
 				"$type" "${name//[[:alnum:]+_.@-]}"
