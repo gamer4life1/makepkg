@@ -107,7 +107,6 @@ srcinfo_write_package() {
 
 	local multivalued+=($(srcinfo_get_distro_variables))
 
-
 	srcinfo_open_section 'pkgname' "$1"
 	srcinfo_write_section_details "$1"
 }
@@ -147,7 +146,7 @@ srcinfo_get_distro_variables() {
 		local distro_variables=""
 
 		for j in "${package_arch}"; do
-			local distro_variables+="$(set | grep -Eo "^[[:alnum:]]*_${i}=|^[[:alnum:]]*_${i}_${j}=" | sed 's|=$||g')"
+			local distro_variables+="$(set | grep -o "^[[:alnum:]]*_${i}=" | sed 's|=$||g')"
 		done
 
 		if [[ "${distro_variables}" != "" ]]; then
