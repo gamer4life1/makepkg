@@ -35,6 +35,11 @@ check_checksums() {
 	# Initialize a map which we'll use to verify that every source array has at
 	# least some kind of checksum array associated with it.
 	(( ${#source[*]} )) && correlation['source']=1
+
+	if [[ "${DISTROVARIABLES}" == "y" ]]; then
+		array_build _ "${distro_release_name}_source" && correlation["${distro_release_name}_source"]=1
+	fi
+
 	case $1 in
 		all)
 			for a in "${arch[@]}"; do
@@ -43,11 +48,19 @@ check_checksums() {
 			;;
 		*)
 			array_build _ source_"$CARCH" && correlation["source_$CARCH"]=1
+
+			if [[ "${DISTROVARIABLES}" == "y" ]]; then
+				array_build _ "${distro_release_name}_source_${CARCH}" && correlation["${distro_release_name}_source_${CARCH}"]=1
+			fi
 			;;
 	esac
 
 	for integ in "${known_hash_algos[@]}"; do
 		verify_integrity_sums "$integ" && unset "correlation[source]"
+
+		if [[ "${DISTROVARIABLES}" == "y" ]]; then
+			verify_integrity_sums "$integ" "" "${distro_release_name}" && unset "correlation[${distro_release_name}_source]"
+		fi
 
 		case $1 in
 			all)
@@ -57,6 +70,10 @@ check_checksums() {
 				;;
 			*)
 				verify_integrity_sums "$integ" "$CARCH" && unset "correlation[source_$CARCH]"
+
+				if [[ "${DISTROVARIABLES}" == "y" ]]; then
+					verify_integrity_sums "$integ" "$CARCH" "$distro_release_name" && unset "correlation[${distro_release_name}_source_${CARCH}]"
+				fi
 				;;
 		esac
 	done
@@ -96,14 +113,24 @@ verify_integrity_one() {
 }
 
 verify_integrity_sums() {
-	local integ=$1 arch=$2 integrity_sums=() sources=() srcname
+	local integ=$1 arch=$2 distro="$3" integrity_sums=() sources=() srcname
 
-	if [[ $arch ]]; then
+	if [[ "${distro}" && "${arch}" ]]; then
+		array_build integrity_sums "${distro}_${integ}sums_${arch}"
+		srcname="${distro}_source_${arch}"
+
+	elif [[ "${distro}" ]]; then
+		array_build integrity_sums "${distro}_${integ}sums"
+		srcname="${distro}_source"
+
+	elif [[ $arch ]]; then
 		array_build integrity_sums "${integ}sums_$arch"
 		srcname=source_$arch
+
 	else
 		array_build integrity_sums "${integ}sums"
 		srcname=source
+
 	fi
 
 	array_build sources "$srcname"
@@ -123,7 +150,7 @@ verify_integrity_sums() {
 			exit 1 # TODO: error code
 		fi
 	elif (( ${#integrity_sums[@]} )); then
-		error "$(gettext "Integrity checks (%s) differ in size from the source array.")" "$integ"
+		error "$(gettext "Integrity checks (%s) for %s differ in size from the source array.")" "$integ" "${srcname}"
 		exit 1 # TODO: error code
 	else
 		return 1

@@ -1257,6 +1257,7 @@ else
 	fi
 fi
 
+# Unset variables from a user's environment variables
 unset pkgname "${pkgbuild_schema_strings[@]}" "${pkgbuild_schema_arrays[@]}"
 unset "${known_hash_algos[@]/%/sums}"
 unset -f pkgver prepare build check package "${!package_@}"
@@ -1264,6 +1265,17 @@ unset "${!makedepends_@}" "${!depends_@}" "${!source_@}" "${!checkdepends_@}"
 unset "${!optdepends_@}" "${!conflicts_@}" "${!provides_@}" "${!replaces_@}"
 unset "${!cksums_@}" "${!md5sums_@}" "${!sha1sums_@}" "${!sha224sums_@}"
 unset "${!sha256sums_@}" "${!sha384sums_@}" "${!sha512sums_@}" "${!b2sums_@}"
+
+current_environment_variables="$(set | grep '^[^= ]*=')"
+
+# Unset distro-specific environment variables.
+# This processes distro-specific global variables (i.e. 'focal_depends') as well
+# as architecture-specific ones (i.e. 'focal_depends_x86_64').
+for i in makedepends depends source checkdepends optdepends conflicts provides replaces chsums md5sums sha1sums sha224sums sha256sums sha384sums sha512sums b2sums; do
+	for j in $(echo "${current_environment_variables}" | grep -o "^[^=]*_${i}[^=]*=" | sed 's|=$||'); do
+		unset "${j}"
+	done
+done
 
 BUILDFILE=${BUILDFILE:-$BUILDSCRIPT}
 if [[ ! -f $BUILDFILE ]]; then

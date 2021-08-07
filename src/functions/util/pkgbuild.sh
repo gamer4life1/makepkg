@@ -217,6 +217,10 @@ get_all_sources() {
 		if array_build l "source_$a"; then
 			aggregate+=("${l[@]}")
 		fi
+
+		if array_build l "${distro_release_name}_source_${a}"; then
+			aggregate+=("${l[@]}")
+		fi
 	done
 
 	array_build "$1" "aggregate"
@@ -229,7 +233,15 @@ get_all_sources_for_arch() {
 		aggregate+=("${l[@]}")
 	fi
 
+	if [[ "${DISTROVARIABLES}" == "y" ]] && array_build l "${distro_release_name}_source"; then
+		aggregate+=("${l[@]}")
+	fi
+
 	if array_build l "source_$CARCH"; then
+		aggregate+=("${l[@]}")
+	fi
+
+	if [[ "${DISTROVARIABLES}" == "y" ]] && array_build l "${distro_release_name}_source_${CARCH}"; then
 		aggregate+=("${l[@]}")
 	fi
 
