@@ -36,9 +36,7 @@ check_checksums() {
 	# least some kind of checksum array associated with it.
 	(( ${#source[*]} )) && correlation['source']=1
 
-	if [[ "${DISTROVARIABLES}" == "y" ]]; then
-		array_build _ "${distro_release_name}_source" && correlation["${distro_release_name}_source"]=1
-	fi
+	array_build _ "${distro_release_name}_source" && correlation["${distro_release_name}_source"]=1
 
 	case $1 in
 		all)
@@ -49,18 +47,14 @@ check_checksums() {
 		*)
 			array_build _ source_"$CARCH" && correlation["source_$CARCH"]=1
 
-			if [[ "${DISTROVARIABLES}" == "y" ]]; then
-				array_build _ "${distro_release_name}_source_${CARCH}" && correlation["${distro_release_name}_source_${CARCH}"]=1
-			fi
+			array_build _ "${distro_release_name}_source_${CARCH}" && correlation["${distro_release_name}_source_${CARCH}"]=1
 			;;
 	esac
 
 	for integ in "${known_hash_algos[@]}"; do
 		verify_integrity_sums "$integ" && unset "correlation[source]"
 
-		if [[ "${DISTROVARIABLES}" == "y" ]]; then
-			verify_integrity_sums "$integ" "" "${distro_release_name}" && unset "correlation[${distro_release_name}_source]"
-		fi
+		verify_integrity_sums "$integ" "" "${distro_release_name}" && unset "correlation[${distro_release_name}_source]"
 
 		case $1 in
 			all)
@@ -71,9 +65,7 @@ check_checksums() {
 			*)
 				verify_integrity_sums "$integ" "$CARCH" && unset "correlation[source_$CARCH]"
 
-				if [[ "${DISTROVARIABLES}" == "y" ]]; then
-					verify_integrity_sums "$integ" "$CARCH" "$distro_release_name" && unset "correlation[${distro_release_name}_source_${CARCH}]"
-				fi
+				verify_integrity_sums "$integ" "$CARCH" "$distro_release_name" && unset "correlation[${distro_release_name}_source_${CARCH}]"
 				;;
 		esac
 	done
