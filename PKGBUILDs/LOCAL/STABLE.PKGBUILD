@@ -30,13 +30,13 @@ prepare() {
 package() {
 	cd "${_foldername}"
 
-	# Copy makepkg
-	install -Dm 555 "src/makepkg.sh" "${pkgdir}/usr/bin/${pkgname}"
+  # Copy makepkg
+	install -Dm 555 "src/makepkg.sh" "${pkgdir}/usr/bin/makedeb-makepkg"
 
 	# Copy functions
 	mkdir -p "${pkgdir}/usr/share/"
-	cp -R "src/functions" "${pkgdir}/usr/share/${pkgname}"
-	chmod 555 "${pkgdir}/usr/share/${pkgname}"
+	cp -R "src/functions/" "${pkgdir}/usr/share/makedeb-makepkg/"
+	chmod 555 "${pkgdir}/usr/share/makedeb-makepkg/"
 
 	# Copy config file
 	install -Dm 444 "src/makepkg.conf" "${pkgdir}/etc/makepkg.conf"
