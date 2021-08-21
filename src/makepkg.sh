@@ -747,7 +747,7 @@ create_package() {
 		--null --files-from - --exclude .MTREE | gzip -c -f -n > .MTREE
 	touch -d @$SOURCE_DATE_EPOCH .MTREE
 
-	msg2 "$(gettext "Compressing package...")"
+	(( FORMAT_MAKEDEB )) || msg2 "$(gettext "Compressing package...")"
 	# TODO: Maybe this can be set globally for robustness
 	shopt -s -o pipefail
 	list_package_files | LANG=C bsdtar --no-fflags -cnf - --null --files-from - |
