@@ -111,8 +111,12 @@ trap_exit() {
 	local signal=$1; shift
 
 	if (( ! INFAKEROOT )); then
-		echo
-		error "$@"
+
+		# Don't print interrupt errors when formatting output for makedeb.
+		if [[ "$signal" == "INT" ]] && ! (( "${FORMAT_MAKEDEB}" )); then
+			echo
+			error "$@"
+		fi
 	fi
 	[[ -n $srclinks ]] && rm -rf "$srclinks"
 
