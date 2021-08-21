@@ -30,19 +30,19 @@ known_hash_algos=({ck,md5,sha{1,224,256,384,512},b2})
 
 pkgbuild_schema_arrays=(arch backup checkdepends conflicts depends groups
                         license makedepends noextract optdepends options
-                        provides replaces source validpgpkeys
+                        provides replaces source validpgpkeys control_fields
                         "${known_hash_algos[@]/%/sums}")
 
 pkgbuild_schema_strings=(changelog epoch install pkgbase pkgdesc pkgrel pkgver
                          url)
 
 pkgbuild_schema_arch_arrays=(checkdepends conflicts depends makedepends
-                             optdepends provides replaces source
+                             optdepends provides replaces source control_fields
                              "${known_hash_algos[@]/%/sums}")
 
 pkgbuild_schema_package_overrides=(pkgdesc arch url license groups depends
                                    optdepends provides conflicts replaces
-                                   backup options install changelog)
+                                   backup options install changelog control_fields)
 
 readonly -a known_hash_algos pkgbuild_schema_arrays \
 	pkgbuild_schema_strings pkgbuild_schema_arch_arrays \
