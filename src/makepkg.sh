@@ -1024,6 +1024,7 @@ usage() {
 	printf -- "$(gettext "  --format-makedeb    Properly format output for makedeb\n")"
 	printf -- "$(gettext "  --holdver           Do not update VCS sources")\n"
 	printf -- "$(gettext "  --key <key>         Specify a key to use for %s signing instead of the default")\n" "gpg"
+	printf -- "$(gettext "  --lint              Check that a build file is using correct syntax")\n"
 	printf -- "$(gettext "  --noarchive         Do not create package archive")\n"
 	printf -- "$(gettext "  --nocheck           Do not run the %s function in the %s")\n" "check()" "$BUILDSCRIPT"
 	printf -- "$(gettext "  --noprepare         Do not run the %s function in the %s")\n" "prepare()" "$BUILDSCRIPT"
@@ -1085,7 +1086,7 @@ OPT_LONG=('allsource' 'check' 'clean' 'cleanbuild' 'config:' 'force' 'geninteg'
           'printsrcinfo' 'repackage' 'rmdeps' 'sign' 'skipchecksums' 'skipinteg'
           'skippgpcheck' 'source' 'syncdeps' 'verifysource' 'version'
 
-		  'distrovars' 'skip-makedeb-warning' 'format-makedeb')
+		  'distrovars' 'skip-makedeb-warning' 'format-makedeb' 'lint')
 
 # Pacman options
 if [[ "${makepkg_target_os}" == "arch" ]]; then
@@ -1123,6 +1124,7 @@ while true; do
 		-i|--install)            INSTALL=1 ;;
 		--key)                   shift; GPGKEY=$1 ;;
 		-L|--log)                LOGGING=1 ;;
+		--lint)                  LINT_PKGBUILD=1 ;;
 		-m|--nocolor)            USE_COLOR='n'; PACMAN_OPTS+=("--color" "never") ;;
 		--noarchive)             NOARCHIVE=1 ;;
 		--nocheck)               RUN_CHECK='n' ;;
@@ -1306,6 +1308,9 @@ pkgbase=${pkgbase:-${pkgname[0]}}
 
 # check the PKGBUILD for some basic requirements
 lint_pkgbuild || exit $E_PKGBUILD_ERROR
+
+# Exit regardless of sucess status if '--lint' was passed.
+(( "${LINT_PKGBUILD}" )) && exit 0
 
 if (( !SOURCEONLY && !PRINTSRCINFO )); then
 	merge_arch_attrs
