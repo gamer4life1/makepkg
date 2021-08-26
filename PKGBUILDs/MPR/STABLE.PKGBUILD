@@ -35,4 +35,14 @@ package() {
 	mkdir -p "${pkgdir}/usr/share/"
 	cp -R "src/functions" "${pkgdir}/usr/share/makedeb-makepkg"
 	chmod 555 "${pkgdir}/usr/share/makedeb-makepkg"
+
+  # Copy config file
+  install -Dm 444 "src/makepkg.conf" "${pkgdir}/etc/makepkg.conf"
+
+  # Copy makepkg-template
+  install -Dm 555 "src/makepkg-template" "${pkgdir}/usr/bin/makepkg-template"
+
+  # Create pacman binary
+  touch "${pkgdir}/usr/bin/pacman"
+  chmod 555 "${pkgdir}/usr/bin/pacman"
 }
