@@ -30,8 +30,7 @@ lint_pkgbuild_functions+=('lint_pkgname')
 
 
 lint_one_pkgname() {
-	local type=$1 name=$2 ret=0
-
+	local type=$1 name=$2 ret=0 remaining_prefix
 
 	if [[ -z $name ]]; then
 		error "$(gettext "%s is not allowed to be empty.")" "$type"
@@ -54,6 +53,17 @@ lint_one_pkgname() {
 	# the Debian control file syntax, so we temporary strip them here.
 	if [[ "${type}" == "optdepends" ]]; then
 		name="$(echo "${name}" | sed -e 's|^r!||' -e 's|^s!||')"
+		remaining_prefix="$(echo "${name}" | grep '!' | grep -o '^[^!]*')"
+
+		# If any other prefix remains, print an error.
+		if [[ "${remaining_prefix}" != "" ]]; then
+			error "$(gettext "%s contains an invalid prefix: '%s!'")" \
+					"$type" "${remaining_prefix}"
+			ret=1
+		fi
+
+		# Strip any remaining prefix for the next check.
+		name="$(echo "${name}" | sed 's|^[^!]*!||')"
 	fi
 
 	if [[ $name = *[^[:alnum:]+_.@-]* ]]; then
