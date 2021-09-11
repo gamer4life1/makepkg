@@ -49,7 +49,7 @@ useradd user
 chown "user:user" "${package_name}_${target_repo}" -R
 cd "${package_name}_${target_repo}"
 
-sudo -u user -- makepkg --printsrcinfo | tee .SRCINFO
+sudo -u user -- makedeb --printsrcinfo | tee .SRCINFO
 
 # Remove 'generated-by = makedeb' line if deploying to AUR.
 if [[ "${target_repo}" == "aur" ]]; then
