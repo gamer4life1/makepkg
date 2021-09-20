@@ -1,6 +1,6 @@
 # Maintainer: Hunter Wittenborn <hunter@hunterwittenborn.com>
 pkgname=makedeb-makepkg
-pkgver=8.5.2
+pkgver=8.5.3
 pkgrel=1
 arch=(any)
 depends=('curl' 'fakeroot' 'libarchive-tools' 'coreutils' 'binutils' 'zstd' 'gettext')
