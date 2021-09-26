@@ -60,7 +60,7 @@ plainerr() {
 msg() {
 	(( QUIET )) && return
 	local mesg=$1; shift
-	printf "${GREEN}==>${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@"
+	printf "${GREEN}[#]${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@"
 }
 
 msg2() {
@@ -76,15 +76,15 @@ ask() {
 
 warning() {
 	local mesg=$1; shift
-	printf "${YELLOW}==> $(gettext "WARNING:")${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&2
+	printf "${YELLOW}[!]${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&2
 }
 
 warning2() {
   local mesg=$1; shift
-  printf "${YELLOW}  ->${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&2
+  printf "${BLUE}  ->${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&2
 }
 
 error() {
 	local mesg=$1; shift
-	printf "${RED}==> $(gettext "ERROR:")${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&2
+	printf "${RED}[!]${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&2
 }
