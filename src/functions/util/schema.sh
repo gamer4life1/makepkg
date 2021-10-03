@@ -33,8 +33,8 @@ pkgbuild_schema_arrays=(arch backup checkdepends conflicts depends groups
                         provides replaces source validpgpkeys control_fields
                         "${known_hash_algos[@]/%/sums}")
 
-pkgbuild_schema_strings=(changelog epoch install pkgbase pkgdesc pkgrel pkgver
-                         url)
+pkgbuild_schema_strings=(changelog epoch install preinst postinst prerm postrm
+                         pkgbase pkgdesc pkgrel pkgver url)
 
 pkgbuild_schema_arch_arrays=(checkdepends conflicts depends makedepends
                              optdepends provides replaces source control_fields
@@ -42,7 +42,8 @@ pkgbuild_schema_arch_arrays=(checkdepends conflicts depends makedepends
 
 pkgbuild_schema_package_overrides=(pkgdesc arch url license groups depends
                                    optdepends provides conflicts replaces
-                                   backup options install changelog control_fields)
+                                   backup options install preinst postinst
+                                   prerm postrm changelog control_fields)
 
 readonly -a known_hash_algos pkgbuild_schema_arrays \
 	pkgbuild_schema_strings pkgbuild_schema_arch_arrays \

@@ -715,7 +715,7 @@ create_package() {
 	write_buildinfo > .BUILDINFO
 
 	# check for changelog/install files
-	for i in 'changelog/.CHANGELOG' 'install/.INSTALL'; do
+	for i in 'changelog/.CHANGELOG' 'install/.INSTALL' 'preinst/.PREINST' 'postinst/.POSTINST' 'prerm/.PRERM' 'postrm/.POSTRM'; do
 		IFS='/' read -r orig dest < <(printf '%s\n' "$i")
 
 		if [[ -n ${!orig} ]]; then
