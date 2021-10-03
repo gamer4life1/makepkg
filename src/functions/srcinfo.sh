@@ -135,22 +135,23 @@ write_srcinfo() {
 	write_srcinfo_content
 }
 
-# Get list of distro-specific packages for:
-# depends, optdepends, conflicts, provides, replaces, and makedepends.
+# Obtain a list of distro-specific variables.
 srcinfo_get_distro_variables() {
 	local package_arch
 	get_pkgbuild_attribute "$1" 'arch' 1 'package_arch'
 
-	for i in source depends optdepends conflicts provides replaces makedepends; do
+	for i in source depends optdepends conflicts provides replaces makedepends "${known_hash_algos[@]/%/sums}"; do
 
 		local distro_variables=""
+		local set_output="$(set)"
 
 		for j in "${package_arch}"; do
-			local distro_variables+="$(set | grep -o "^[[:alnum:]]*_${i}=" | sed 's|=$||g')"
+			local distro_variables+="$(echo "${set_output}" | grep -o "^[[:alnum:]]*_${i}=" | sed 's|=$||g')"
+			local distro_variables+="$(echo "${set_output}" | grep -o "^[[:alnum:]]*_${i}_${j}=" | sed 's|=$||g')"
 		done
 
 		if [[ "${distro_variables}" != "" ]]; then
-			echo ${distro_variables}
+			echo "${distro_variables}"
 		fi
 	done
 }
