@@ -719,7 +719,6 @@ create_package() {
 		IFS='/' read -r orig dest < <(printf '%s\n' "$i")
 
 		if [[ -n ${!orig} ]]; then
-			msg2 "$(gettext "Adding %s file...")" "$orig"
 			if ! cp "$startdir/${!orig}" "$dest"; then
 				error "$(gettext "Failed to add %s file to package.")" "$orig"
 				exit $E_MISSING_FILE
