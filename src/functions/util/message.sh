@@ -66,7 +66,7 @@ msg() {
 msg2() {
 	(( QUIET )) && return
 	local mesg=$1; shift
-	printf "${BLUE}  ->${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@"
+	printf "${BLUE}  [->]${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@"
 }
 
 ask() {
@@ -81,7 +81,7 @@ warning() {
 
 warning2() {
   local mesg=$1; shift
-  printf "${BLUE}  ->${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&2
+  printf "${YELLOW}  [->]${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&2
 }
 
 error() {
