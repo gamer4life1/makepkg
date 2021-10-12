@@ -36,36 +36,32 @@ lint_one_pkgname() {
 		error "$(gettext "%s is not allowed to be empty.")" "$type"
 		return 1
 	fi
+	
 	if [[ ${name:0:1} = "-" ]]; then
 		error "$(gettext "%s is not allowed to start with a hyphen.")" "$type"
 		ret=1
 	fi
+	
 	if [[ ${name:0:1} = "." ]]; then
 		error "$(gettext "%s is not allowed to start with a dot.")" "$type"
 		ret=1
 	fi
+	
 	if [[ $name = *[![:ascii:]]* ]]; then
 		error "$(gettext "%s may only contain ascii characters.")" "$type"
 		return 1
 	fi
 
-	# Packages in 'optdepends' are allowed to be prefixed with 'r!' and 's!' for
-	# the Debian control file syntax, so we temporary strip them here.
-	if [[ "${type}" == "optdepends" ]]; then
-		name="$(echo "${name}" | sed -e 's|^r!||' -e 's|^s!||')"
-		remaining_prefix="$(echo "${name}" | grep '!' | grep -o '^[^!]*')"
-
-		# If any other prefix remains, print an error.
-		if [[ "${remaining_prefix}" != "" ]]; then
-			error "$(gettext "%s contains an invalid prefix: '%s!'")" \
-					"$type" "${remaining_prefix}"
-			ret=1
-		fi
-
-		# Strip any remaining prefix for the next check.
-		name="$(echo "${name}" | sed 's|^[^!]*!||')"
+	if [[ "${type}" == "depends" ]]; then
+		check_prefix prefix "${name}" 'p!' || \
+			error "$(gettext "%s contains an invalid prefix: '%s'")" "${type}" "${prefix}"
+		return 1
+	elif [[ "${type}" == "optdepends" ]]; then
+		check_prefix prefix "${name}" 'r!' 's!' || \
+			error "$(gettext "%s contains an invalid prefix: '%s'")" "${type}" "${prefix}"
+		return 1
 	fi
-
+	
 	if [[ $name = *[^[:alnum:]+_.@-]* ]]; then
 		error "$(gettext "%s contains invalid characters: '%s'")" \
 				"$type" "${name//[[:alnum:]+_.@-]}"
@@ -88,4 +84,25 @@ lint_pkgname() {
 	fi
 
 	return $ret
+}
+
+check_prefix() {
+	local return_variable="${1}"
+	local variable_data="${2}"
+	local variable_prefixes=("${@:3}")
+	local ret=1
+	
+	local variable_prefix="$(echo "${variable_data}" | sed 's|[^!]*$||')"
+	
+	for i in "${variable_prefixes[@]}"; do
+		if [[ "${i}" == "${variable_prefix}" ]]; then
+			ret=0
+		fi
+	done
+
+	if [[ "${ret}" != "0" ]]; then
+		declare -g "${return_variable}=${variable_prefix}"
+	fi
+	
+	return "${ret}"
 }
