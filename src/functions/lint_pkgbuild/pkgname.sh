@@ -94,11 +94,15 @@ check_prefix() {
 	
 	local variable_prefix="$(echo "${variable_data}" | sed 's|[^!]*$||')"
 	
-	for i in "${variable_prefixes[@]}"; do
-		if [[ "${i}" == "${variable_prefix}" ]]; then
-			ret=0
-		fi
-	done
+	if [[ "${variable_prefix}" == "" ]]; then
+		ret=0
+	else
+		for i in "${variable_prefixes[@]}"; do
+			if [[ "${i}" == "${variable_prefix}" ]]; then
+				ret=0
+			fi
+		done
+	fi
 
 	if [[ "${ret}" != "0" ]]; then
 		declare -g "${return_variable}=${variable_prefix}"
