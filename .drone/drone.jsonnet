@@ -66,6 +66,32 @@ local userRepoPublish(package_name, branch, repo_name) = {
 	}]
 };
 
+local sendBuildNotification(tag) = {
+	name: "send-build-notification-" + tag,
+	kind: "pipeline",
+	type: "docker",
+	trigger: {
+		branch: [tag],
+		status: ["success", "failure"]
+	},
+	depends_on: [
+		"create-tag-" + tag,
+		"publish-apt-repo-" + tag,
+		"mpr-publish-" + tag,
+		"aur-publish-" + tag
+	],
+	steps: [{
+		name: "send-notification",
+		image: "proget.hunterwittenborn.com/docker/hwittenborn/drone-matrix",
+		settings: {
+			username: "drone",
+			password: {from_secret: "matrix_api_key"},
+			homeserver: "https://matrix.hunterwittenborn.com",
+			room: "#makedeb-ci-logs:hunterwittenborn.com"
+		}
+	}]
+};
+
 [
 	createTag("stable"),
 	createTag("beta"),
@@ -81,6 +107,9 @@ local userRepoPublish(package_name, branch, repo_name) = {
 
 	userRepoPublish("makedeb-makepkg", "stable", "aur"),
 	userRepoPublish("makedeb-makepkg-beta", "beta", "aur"),
-	userRepoPublish("makedeb-makepkg-alpha", "alpha", "aur")
+	userRepoPublish("makedeb-makepkg-alpha", "alpha", "aur"),
 
+	sendBuildNotification("stable"),
+	sendBuildNotification("beta"),
+	sendBuildNotification("alpha")
 ]
