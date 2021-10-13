@@ -53,13 +53,18 @@ lint_one_pkgname() {
 	fi
 
 	if [[ "${type}" == "depends" ]]; then
-		check_prefix prefix "${name}" 'p!' || \
+		if ! check_prefix prefix "${name}" 'p!'; then
 			error "$(gettext "%s contains an invalid prefix: '%s'")" "${type}" "${prefix}"
-		return 1
+			return 1
+		fi
+		strip_prefix name "${name}"
+		
 	elif [[ "${type}" == "optdepends" ]]; then
-		check_prefix prefix "${name}" 'r!' 's!' || \
+		if ! check_prefix prefix "${name}" 'r!' 's!'; then
 			error "$(gettext "%s contains an invalid prefix: '%s'")" "${type}" "${prefix}"
-		return 1
+			return 1
+		fi
+		strip_prefix name "${name}"
 	fi
 	
 	if [[ $name = *[^[:alnum:]+_.@-]* ]]; then
@@ -109,4 +114,15 @@ check_prefix() {
 	fi
 	
 	return "${ret}"
+}
+
+strip_prefix() {
+	local return_variable="${1}"
+	local variable_data="${2}"
+	local prefix=""
+	
+	prefix="$(echo "${variable_data}" | sed 's|[^!]*$||')"
+	variable_data="$(echo "${variable_data}" | sed "s|^${prefix}||")"
+	
+	printf -v "${return_variable}" "${variable_data}"
 }
