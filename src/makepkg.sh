@@ -1151,7 +1151,7 @@ while true; do
 		-V|--version)            version; exit $E_OK ;;
 
 		--distrovars)            warning "'${1}' has been deprecated, and should not be used." ;;
-		--format-makedeb)        export FORMAT_MAKEDEB=1 ;;
+		--format-makedeb)        FORMAT_MAKEDEB=1 ;;
 		--)                      shift; break ;;
 	esac
 	shift
@@ -1458,7 +1458,7 @@ if (( SOURCEONLY )); then
 fi
 
 if (( NODEPS || ( VERIFYSOURCE && !DEP_BIN ) )); then
-	if (( NODEPS )); then
+	if (( NODEPS )) && ! (( "${FORMAT_MAKEDEB}" )); then
 		warning "$(gettext "Skipping dependency checks.")"
 	fi
 else
@@ -1467,14 +1467,14 @@ else
 	fi
 	deperr=0
 
-	(( ${RUNNING_ON_ARCH})) && msg "$(gettext "Checking runtime dependencies...")"
+	(( ${RUNNING_ON_ARCH} )) && msg "$(gettext "Checking runtime dependencies...")"
 	resolve_deps ${depends[@]} || deperr=1
 
 	if (( RMDEPS && INSTALL )); then
 		original_pkglist=($(run_pacman -Qq))    # required by remove_dep
 	fi
 
-	(( ${RUNNING_ON_ARCH})) && msg "$(gettext "Checking buildtime dependencies...")"
+	(( ${RUNNING_ON_ARCH} )) && msg "$(gettext "Checking buildtime dependencies...")"
 	if (( CHECKFUNC )); then
 		resolve_deps "${makedepends[@]}" "${checkdepends[@]}" || deperr=1
 	else
