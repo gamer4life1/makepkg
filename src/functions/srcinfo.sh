@@ -125,10 +125,16 @@ write_srcinfo_content() {
 	local pkg
 	local set_output="${1}"
 
+	# write_srcinfo_content() is called directly in addition to write_srcinfo(), so we
+	# need to handle the 'set_output' variable not being set.
+	if ! [[ "${set_output}" ]]; then
+		set_output="$(set)"
+	fi
+
 	srcinfo_open_section 'generated-by' 'makedeb-makepkg'
 	srcinfo_separate_section
 
-	srcinfo_write_global
+	srcinfo_write_global "${set_output}"
 
 	for pkg in "${pkgname[@]}"; do
 		srcinfo_separate_section
@@ -138,7 +144,7 @@ write_srcinfo_content() {
 
 write_srcinfo() {
 	local set_output="$(set)"
-	
+
 	write_srcinfo_header
 	write_srcinfo_content "${set_output}"
 }
@@ -154,8 +160,8 @@ srcinfo_get_distro_variables() {
 		local distro_variables=""
 
 		for j in "${package_arch}"; do
-			local distro_variables+="$(echo "${set_output}" | grep -o "^[[:alnum:]]*_${i}=" | sed 's|=$||g')"
-			local distro_variables+="$(echo "${set_output}" | grep -o "^[[:alnum:]]*_${i}_${j}=" | sed 's|=$||g')"
+			local distro_variables+="$(echo "${set_output}" | grep -o "^[[:alnum:]]\+_${i}=" | sed 's|=$||g')"
+			local distro_variables+="$(echo "${set_output}" | grep -o "^[[:alnum:]]\+_${i}_${j}=" | sed 's|=$||g')"
 		done
 
 		if [[ "${distro_variables}" != "" ]]; then
