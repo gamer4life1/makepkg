@@ -1,3 +1,9 @@
+makedeb-makepkg (8.8.0-3) unstable; urgency=medium
+
+  * Hmm...
+
+ -- Leo Puvilland <lpuvilla0001@mymail.lausd.net>  Fri, 29 Oct 2021 09:05:24 -0700
+
 makedeb-makepkg (8.8.0-2) unstable; urgency=medium
 
   * Change to quilt
