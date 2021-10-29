@@ -1,0 +1,11 @@
+makedeb-makepkg (8.8.0-2) unstable; urgency=medium
+
+  * Change to quilt
+
+ -- Leo Puvilland <lpuvilla0001@mymail.lausd.net>  Thu, 28 Oct 2021 17:44:06 -0700
+
+makedeb-makepkg (8.8.0-1) unstable; urgency=medium
+
+  * Initial Release. (closes Bug#998038)
+
+ -- Leo Puvilland <lpuvilla0001@mymail.lausd.net>  Sat, 23 Oct 2021 12:54:49 -0700
