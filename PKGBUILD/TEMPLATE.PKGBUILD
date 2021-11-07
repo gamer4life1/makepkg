@@ -7,6 +7,7 @@ pkgver=$${pkgver}
 pkgrel=$${pkgrel}
 arch=(any)
 depends=($${depends})
+makedepends=($${makedepends})
 conflicts=($${conflicts})
 license=('GPL2')
 url="https://github.com/makedeb/makepkg"
