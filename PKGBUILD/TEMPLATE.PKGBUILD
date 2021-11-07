@@ -5,6 +5,7 @@ _target=$${target}
 pkgname=$${pkgname}
 pkgver=$${pkgver}
 pkgrel=$${pkgrel}
+pkgdesc="ABS packaging utility"
 arch=(any)
 depends=($${depends})
 makedepends=($${makedepends})
