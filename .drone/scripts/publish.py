@@ -17,9 +17,9 @@ with open(".data.json") as file:
     pkgrel = json["current_pkgrel"]
 
 if commit_branch == "stable":
-    package_name = "makepkg"
+    package_name = "makedeb-makepkg"
 else:
-    package_name = f"makepkg-{commit_branch}"
+    package_name = f"makedeb-makepkg-{commit_branch}"
 
 filename = f"{package_name}_{pkgver}-{pkgrel}_all.deb"
 
