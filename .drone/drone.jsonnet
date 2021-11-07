@@ -1,68 +1,80 @@
-local createTag(branch) = {
-	name: "create-tag-" + branch,
+local createTag(tag) = {
+	name: "create-tag-" + tag,
 	kind: "pipeline",
 	type: "docker",
-	trigger: {branch: [branch]},
+	trigger: {branch: [tag]},
 
 	steps: [{
-		name: branch,
-		image: "proget.hunterwittenborn.com/docker/hunter/makedeb:stable",
+		name: tag,
+		image: "proget.hunterwittenborn.com/docker/makedeb/makedeb-alpha:ubuntu-focal",
 		environment: {
-			release_type: branch,
 			ssh_key: {from_secret: "ssh_key"},
-			known_hosts: {from_secret: "known_hosts"}
+			known_hosts: {from_secret: "known_hosts"},
+			release_type: tag
 		},
 
-		commands: [".drone/scripts/create_tag.sh"]
+		commands: [
+			"sudo apt-get install openssh-client git jq -yq",
+			".drone/scripts/create_tag.sh"
+		]
 	}]
 };
 
-local publishAptRepository(branch) = {
-	name: "publish-apt-repo-" + branch,
+local buildAndPublish(package_name, tag) = {
+	name: "build-and-publish-" + tag,
 	kind: "pipeline",
 	type: "docker",
-	trigger: {branch: [branch]},
-	depends_on: ["create-tag-" + branch],
-
+	trigger: {branch: [tag]},
+	depends_on: ["create-tag-" + tag],
 	steps: [
 		{
-			name: "build",
-			image: "proget.hunterwittenborn.com/docker/hunter/makedeb:stable",
-			environment: {branch: branch},
-			commands: [".drone/scripts/apt.sh build"]
-		},
+			name: "build-debian-package",
+			image: "proget.hunterwittenborn.com/docker/makedeb/makedeb-alpha:ubuntu-focal",
+			environment: {release_type: tag, package_name: package_name},
+			commands: [
+				"sudo apt-get install git jq sudo sed -yq",
+				"sudo chown 'makedeb:makedeb' ./ -R",
+				".drone/scripts/build.sh"
+			]
+        	},
 
 		{
-			name: "publish",
-			image: "proget.hunterwittenborn.com/docker/hunter/makedeb:stable",
+			name: "publish-proget",
+			image: "proget.hunterwittenborn.com/docker/makedeb/makedeb-alpha:ubuntu-focal",
 			environment: {proget_api_key: {from_secret: "proget_api_key"}},
-			commands: [".drone/scripts/apt.sh publish"]
+			commands: [
+				"sudo apt-get install python3 python3-requests -yq",
+				".drone/scripts/publish.py"
+			]
 		}
 	]
 };
 
-local userRepoPublish(package_name, branch, repo_name) = {
-	name: repo_name + "-publish-" + branch,
+local userRepoPublish(package_name, tag, user_repo) = {
+	name: user_repo + "-publish-" + tag,
 	kind: "pipeline",
 	type: "docker",
-	trigger: {branch: [branch]},
+	trigger: {branch: [tag]},
 	depends_on: [
-		"create-tag-" + branch,
-		"publish-apt-repo-" + branch
+		"build-and-publish-" + tag,
+		"create-tag-" + tag
 	],
 
 	steps: [{
-		name: branch,
-		image: "proget.hunterwittenborn.com/docker/hunter/makedeb:stable",
+		name: package_name,
+		image: "proget.hunterwittenborn.com/docker/makedeb/makedeb-alpha:ubuntu-focal",
 		environment: {
 			ssh_key: {from_secret: "ssh_key"},
 			known_hosts: {from_secret: "known_hosts"},
 			package_name: package_name,
-			release_type: branch,
-			target_repo: repo_name
+			release_type: tag,
+			target_repo: user_repo
 		},
 
-		commands: [".drone/scripts/user-repo.sh"]
+		commands: [
+			"sudo apt-get install sudo openssh-client sed git jq -yq",
+			".drone/scripts/user-repo.sh"
+		]
 	}]
 };
 
@@ -76,7 +88,7 @@ local sendBuildNotification(tag) = {
 	},
 	depends_on: [
 		"create-tag-" + tag,
-		"publish-apt-repo-" + tag,
+		"build-and-publish-" + tag,
 		"mpr-publish-" + tag,
 		"aur-publish-" + tag
 	],
@@ -97,9 +109,9 @@ local sendBuildNotification(tag) = {
 	createTag("beta"),
 	createTag("alpha"),
 
-	publishAptRepository("stable"),
-	publishAptRepository("beta"),
-	publishAptRepository("alpha"),
+	buildAndPublish("makedeb-makepkg", "stable"),
+	buildAndPublish("makedeb-makepkg-beta", "beta"),
+	buildAndPublish("makedeb-makepkg-alpha", "alpha"),
 
 	userRepoPublish("makedeb-makepkg", "stable", "mpr"),
 	userRepoPublish("makedeb-makepkg-beta", "beta", "mpr"),
@@ -108,7 +120,7 @@ local sendBuildNotification(tag) = {
 	userRepoPublish("makedeb-makepkg", "stable", "aur"),
 	userRepoPublish("makedeb-makepkg-beta", "beta", "aur"),
 	userRepoPublish("makedeb-makepkg-alpha", "alpha", "aur"),
-
+	
 	sendBuildNotification("stable"),
 	sendBuildNotification("beta"),
 	sendBuildNotification("alpha")

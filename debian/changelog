@@ -1,0 +1,5 @@
+makedeb-makepkg (8.11.0-1) unstable; urgency=medium
+
+  * Initial Release. (closes Bug#998038)
+
+ -- Leo Puvilland <lpuvilla0001@mymail.lausd.net>  Wed, 03 Nov 2021 18:21:02 -0700

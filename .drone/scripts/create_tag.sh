@@ -1,22 +1,24 @@
 #!/usr/bin/env bash
-set -exuo pipefail
+set -e
+sudo chown 'makedeb:makedeb' ./ -R
 
 # Set up SSH
-rm -rf /root/.ssh
-mkdir -p /root/.ssh
+rm -rf "/${HOME}/.ssh"
+mkdir -p "/${HOME}/.ssh"
 
-echo "${ssh_key}" | tee /root/.ssh/ssh_key
-echo "${known_hosts}" | tee /root/.ssh/known_hosts
+echo "${ssh_key}" | tee "/${HOME}/.ssh/ssh_key"
+echo "${known_hosts}" | tee "/${HOME}/.ssh/known_hosts"
 
-echo "Host ${github_url}" | tee /root/.ssh/config
-echo "  Hostname ${github_url}" | tee -a /root/.ssh/config
-echo "  IdentityFile /root/.ssh/ssh_key" | tee -a /root/.ssh/config
+echo "Host ${github_url}" | tee "/${HOME}/.ssh/config"
+echo "  Hostname ${github_url}" | tee -a "/${HOME}/.ssh/config"
+echo "  IdentityFile /${HOME}/.ssh/ssh_key" | tee -a "/${HOME}/.ssh/config"
 
-chmod 400 /root/.ssh/ -R
+ls -alF "/${HOME}/.ssh/"
+chmod 500 "/${HOME}/.ssh/"* -R
 
 # Get current package version
-package_version="$(cat "PKGBUILD" | grep '^pkgver=' | awk -F '=' '{print $2}')"
+version="$(cat .data.json | jq -r '.current_pkgver + "-" + .current_pkgrel')"
 
 # Create and push release
-git tag "v${package_version}-${release_type}" -am ""
-git push "ssh://git@${github_url}/makedeb/makepkg" "v${package_version}-${release_type}"
+git tag -f "v${version}-${release_type}" -am ""
+git push -f "ssh://git@${github_url}/makedeb/makepkg" "v${version}-${release_type}"
