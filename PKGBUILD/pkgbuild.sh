@@ -99,9 +99,9 @@ pkgrel="$(echo "${config_file}" | jq -r ".current_pkgrel")"
 
 # Generate the PKGBUILD file.
 if [[ "${RELEASE}" == "stable" ]]; then
-	pkgname="makepkg"
+	pkgname="makedeb-makepkg"
 else
-	pkgname="makepkg-${RELEASE}"
+	pkgname="makedeb-makepkg-${RELEASE}"
 fi
 
 depends="${TARGET}_${RELEASE}_depends[@]"
