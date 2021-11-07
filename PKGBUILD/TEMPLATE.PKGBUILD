@@ -22,5 +22,10 @@ prepare() {
 
 package() {
 	cd makepkg/
-	make package DESTDIR="${pkgdir}" TARGET_OS="${_target}"
+
+    if [[ "${_target}" == "local" || "${_target}" == "mpr" ]]; then
+        make package DESTDIR="${pkgdir}" PACMAN_BINARY=1
+    else
+	    make package DESTDIR="${pkgdir}"
+    fi
 }

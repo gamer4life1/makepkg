@@ -41,12 +41,12 @@ unset CDPATH
 unset GREP_OPTIONS
 
 declare -r makepkg_program_name="${makepkg_program_name:-makedeb-makepkg}"
-declare -r makepkg_version='git'
+declare -r makepkg_version='$${MAKEPKG_VERSION}'
 declare -r confdir='/etc'
 declare -r BUILDSCRIPT='PKGBUILD'
 declare -r startdir="$(pwd -P)"
 
-declare -r makepkg_target_os="arch"
+declare -r makepkg_target_os='$${TARGET_OS}'
 declare -r distro_release_name="$(lsb_release -cs)"
 
 LIBRARY=${LIBRARY:-'./functions'}    # REMOVE AT PACKAGING
