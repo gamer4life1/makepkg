@@ -10,7 +10,7 @@ base_beta_conflicts=('makedeb-makepkg' 'makedeb-makepkg-alpha')
 base_alpha_conflicts=('makedeb-makepkg' 'makedeb-makepkg-beta')
 
 base_debian_depends=('curl' 'fakeroot' 'libarchive-tools' 'coreutils' 'binutils' 'zstd' 'gettext')
-base_debian_makedepends=('asciidoctor' 'git' 'make')
+base_debian_makedepends=('asciidoctor' 'git' 'make' 'jq')
 
 base_arch_depends=('awk' 'libarchive' 'bzip2' 'coreutils' 'fakeroot' 'file' 'findutils' 'gettext' 'gnupg' 'grep' 'gzip' 'sed' 'ncurses' 'xz')
 base_arch_makedepends=("${base_debian_makedepends[@]}")
