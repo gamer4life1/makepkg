@@ -49,6 +49,11 @@ if [[ "${target_repo}" == "aur" ]]; then
 	cat .SRCINFO
 fi
 
+# If no files were changed, abort.
+if [[ "$(git diff)" == "" ]]; then
+    exit 0
+fi
+
 # Set up Git identity information
 git config user.name "Kavplex Bot"
 git config user.email "kavplex@hunterwittenborn.com"
