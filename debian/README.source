@@ -10,5 +10,5 @@ This repository serves as a fork of makepkg, which incorporates some changes to 
 # Reporting issues
 Issues with this fork of makepkg should be [made in the makedeb repository](https://github.com/makedeb/makedeb/issues/new?assignees=&labels=makepkg&template=makepkg.md&title=).
 
- -- Leo Puvilland <lpuvilla0001@mymail.lausd.net>  Sat, 23 Oct 2021 12:54:49 -0700
+ -- Leo Puvilland <leo@craftcat.dev>  Sat, 23 Oct 2021 12:54:49 -0700
 

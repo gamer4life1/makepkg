@@ -1,7 +1,7 @@
 Source: makedeb-makepkg
 Section: metapackages
 Priority: optional
-Maintainer: Leo Puvilland <lpuvilla0001@mymail.lausd.net>
+Maintainer: Leo Puvilland <leo@craftcat.dev>
 Build-Depends: debhelper-compat (= 12), curl, fakeroot, libarchive-tools, coreutils, binutils, zstd, gettext
 Standards-Version: 4.5.1
 Homepage: https://github.com/makedeb/makepkg/
